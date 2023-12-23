@@ -1,0 +1,102 @@
+.list-group-item {
+    border-left: 0;
+    border-right: 0;
+}
+.navbar-brand {
+    margin: 0 0 0 10px;
+}
+#content {
+    width: 100%;
+    padding: 0; /* 10px */
+    transition: all 0.3s;
+}
+.container {
+    width: 100%;
+    max-width: 100%;
+}
+body, .container {
+    margin: 0 0 0 0;
+}
+
+/* Added styles for hamburger */
+
+.dropdown-menu li{
+    position: relative;
+}
+.dropdown-menu .submenu{                 
+    left:100%; top:-7px;
+}
+.dropdown-menu .submenu-left{ 
+    right:100%; left:auto;
+}
+
+.dropdown-menu > li:hover{ background-color: #f1f1f1 }
+.dropdown-menu, .dropdown-menu.submenu {
+    border: none;
+    border-radius: 0;
+    border-top: 1px solid #DDD;            
+    border-bottom: 1px solid #DDD;    
+}       
+
+li {
+    margin-bottom: -1px;
+}
+
+#main-nav {
+   position: absolute;           
+   border: 1px solid #DDD;     
+   background-color: #FFF;    
+   padding-right: 10px;           
+   /* min-width: 300px; */
+}
+
+.navbar {
+  justify-content: flex-start;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: #000;
+}        
+
+.navbar-nav .nav-link { padding: 5px 0px; }
+
+.dropdown-menu {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    
+}
+
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+.dropdown-toggle {
+    padding: 5px 3px 0 3px;
+}
+
+.nav-item a.nav-link, .dropdown-toggle, .dropdown-item {
+  display: block;
+}
+
+.dropdown-item {
+  width: initial;
+  padding: 5px 0px;
+  clear: initial !important;
+}
+
+#main-nav {
+    z-index: 9999;
+}
+
+#main-nav-toggler {
+    margin-top: 2px;
+    border-color: #FFF;
+}
+
+#main-nav-toggler i {
+    font-size: 1.75rem;
+}
+
+#main-nav-toggler:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255,255,255,0.3);
+}
