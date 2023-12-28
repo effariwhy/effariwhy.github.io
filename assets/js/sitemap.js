@@ -1,48 +1,8 @@
-var menu = [
-{
-    "label": "Home",
-    "href": "index.html",
-    "implicit": "Y"
-},
-{
-    "label": "Test",
-    "href": "index.html?x=test",
-    "implicit": "Y",
-    "children": [
-        {
-            "label": "Test",
-            "href": "index.html?x=test/test",
-            "implicit": "Y",
-            "children": [
-                {
-                    "label": "Test",
-                    "href": "index.html?x=test/test",
-                    "implicit": "Y"
-                }
-            ]
-        }
-    ]
-},
-{
-    "label": "Test 2",
-    "href": "?x=test2",
-    "implicit": "N",
-    "children": [
-        {
-            "label": "Test",
-            "href": "?x=test2/test",
-            "implicit": "Y",
-            "children": []
-        }
-    ]
-}];
+export var iconOpen = "bi-chevron-right";
+export var iconClose = "bi-chevron-down";
+export var indentFactor = 6;
 
-var iconOpen = "bi-chevron-right";
-var iconClose = "bi-chevron-down";
-var indentFactor = 6;
-var mainNav = "#main-nav";
-
-function buildMenu(items, navContainer, parent, level) {
+export function buildMenu(items, navContainer, parent, level) {
     if (navContainer) {                
         var rootElement = document.createElement("ul");
         rootElement.classList.add("navbar-nav");                
@@ -54,7 +14,7 @@ function buildMenu(items, navContainer, parent, level) {
             var li = document.createElement("li");
             var a = document.createElement("a");
             var id = '';   
-            if (parent.classList.contains("navbar-nav")) {
+            if (parent.classList.contains("navbar-nav")) { 
                 id = "dropdown-"+i;
                 li.classList.add("nav-item");                        
                 a.classList.add("nav-link");                
@@ -62,7 +22,7 @@ function buildMenu(items, navContainer, parent, level) {
                 id = parent.getAttribute("id") + "-" + i;
                 a.classList.add("dropdown-item");
             }                            
-            if ("implicit" in items[i] && items[i].implicit == 'Y') { 
+            if ("href" in items[i]) { 
                 a.setAttribute("href", items[i].href);
             }
             a.textContent = items[i].label;      
@@ -98,19 +58,14 @@ function buildMenu(items, navContainer, parent, level) {
     }           
 }
 
-function buildAreaMap(request_path,items, parent) {    
+export function buildAreaMap(request_path,items, parent) {      
+    if (parent === null){
+        return;
+    }
     for (var i = 0; i < items.length; i++) {      
-        if(items[i].href.startsWith(request_path) && items[i].href != request_path){     
+        if("href" in items[i] && items[i].href.startsWith(request_path) && items[i].href != request_path){     
             var li = document.createElement("li");     
-            if ("implicit" in items[i] && items[i].implicit == 'Y') { 
-                var a = document.createElement("a");
-                a.textContent = items[i].label;    
-                a.setAttribute("href", items[i].href);
-                li.append(a);
-            }  
-            else{
-                li.textContent = items[i].label;    
-            }
+            li.textContent = items[i].label;    
             if ("children" in items[i] && items[i].children.length > 0) {                  
                 var ul = document.createElement("ul");                
                 ul.setAttribute("id", parent.getAttribute("id") + "-" + i); 
@@ -127,10 +82,13 @@ function buildAreaMap(request_path,items, parent) {
     }     
 }
 
-function buildSiteMap(items, parent) {    
+export function buildSiteMap(items, parent) {    
+    if (parent === null){
+        return;
+    }
     for (var i = 0; i < items.length; i++) {      
         var li = document.createElement("li");     
-        if ("implicit" in items[i] && items[i].implicit == 'Y') { 
+        if ("href" in items[i]) { 
             var a = document.createElement("a");
             a.textContent = items[i].label;    
             a.setAttribute("href", items[i].href);
@@ -149,7 +107,7 @@ function buildSiteMap(items, parent) {
     }     
 }
 
-function setMenuLocation() {
+export function setMenuLocation(containerID) {
     var toggler = document.querySelector('.navbar-toggler').getBoundingClientRect();            
     var bar = document.querySelector('.navbar').getBoundingClientRect();            
     var xpos = toggler.left;
@@ -157,12 +115,55 @@ function setMenuLocation() {
     if (window.innerWidth < 768) {
         xpos = 0;
     }
-    document.querySelector(mainNav).style.left = String(xpos)+"px";
-    document.querySelector(mainNav).style.top = String(ypos)+"px";          
+    document.querySelector(containerID).style.left = String(xpos)+"px";
+    document.querySelector(containerID).style.top = String(ypos)+"px";          
 }
 
-window.addEventListener("resize", function() {
-    setMenuLocation();
-});
+export function onLoadThisModuleFile(menu, containerID) {
+    buildMenu(menu, containerID, null, null);  
+    setMenuLocation(containerID);   
+
+    
+    const toggleButton = document.getElementById('main-nav-toggler');
+    toggleButton.addEventListener('click', () => {
+        console.log('clicked');
+        const iconElement = toggleButton.querySelector('b');
+        console.log()
+        //iconElement.classList.toggle('bi-list');
+        //iconElement.classList.toggle('bi-x-lg');        
+        if (iconElement.classList.contains('bi-list')) {
+            iconElement.classList.remove('bi-list');
+            iconElement.classList.add('bi-x-lg');                             
+        } else {
+            iconElement.classList.add('bi-list');
+            iconElement.classList.remove('bi-x-lg');                                        
+        }
+    });
+
+    /////// Prevent closing from click inside dropdown
+    document.querySelectorAll('.dropdown-menu').forEach(function(element) {
+        element.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+    });
+    const attrObserver = new MutationObserver((mutations) => {
+        mutations.forEach(mu => {                    
+            if (mu.type !== "attributes" && mu.attributeName !== "class") return;
+            var i = mu.target.querySelector("i");
+            if (!mu.target.classList.contains("show")) {
+                i.classList.remove(iconClose);
+                i.classList.add(iconOpen);                                
+            } else {
+                i.classList.add(iconClose);
+                i.classList.remove(iconOpen);                                
+            }
+        });
+    });
+
+    const ddt = document.querySelectorAll(".dropdown-toggle");
+    ddt.forEach(el => attrObserver.observe(el, {attributes: true}));
+
+}
+
 
 

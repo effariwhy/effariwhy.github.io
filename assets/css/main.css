@@ -18,7 +18,7 @@ body, .container {
     margin: 0 0 0 0;
 }
 
-/* Added styles for hamburger */
+/* styles for hamburger */
 
 .dropdown-menu li{
     position: relative;
@@ -76,6 +76,7 @@ li {
 
 .nav-item a.nav-link, .dropdown-toggle, .dropdown-item {
   display: block;
+  white-space: nowrap;
 }
 
 .dropdown-item {
@@ -86,6 +87,7 @@ li {
 
 #main-nav {
     z-index: 9999;
+    min-width: 80%;
 }
 
 #main-nav-toggler {

@@ -1,6 +1,7 @@
-const markdownContent = `
+const htmlContent = `
+<p>Welcome to <strong><em>effariwhy.github.io</em></strong>, where I organize things from social media and virtual reality.</p>
 
+<p><a href="vr-exercise">effariwhy.github.io/vr-exercise</a> is my version of moonrider.xyz with no walls</p>
 
-I love exercising with the Quest 2 and when my shoulders and elbows have had enough of Beat Saber, I switch to a modified version of Moonrider that I'm working on. <a href="vr-exercise/">My latest version</a> has no leader board or walls and the default playlists are switched to a few of my own.
-
+<div id="site-map"></div>
 `;
