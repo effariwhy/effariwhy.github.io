@@ -1,4 +1,4 @@
-const menuInnerTemplate = `<menuitem><span class="heading">{{header_label}}</span></menuitem>{{menu_items_html}}`
+const menuInnerTemplate = `<menuitem><span class="heading">{{header_label}}</span></menuitem>{{menu_items_html}}`;
 const menuItemTemplate = `<menuitem><span>{{label}}</span></menuitem>`;
 const menuItemWithChildrenTemplate = `
 <menuitem>
