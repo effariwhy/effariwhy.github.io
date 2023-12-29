@@ -3,5 +3,6 @@ const htmlContent = `
 
 <p><a href="vr-exercise">effariwhy.github.io/vr-exercise</a> is my version of moonrider.xyz with no walls</p>
 
+<h2>Sitemap</h2>
 <div id="site-map"></div>
 `;

@@ -1,61 +1,34 @@
-export var iconOpen = "bi-chevron-right";
-export var iconClose = "bi-chevron-down";
-export var indentFactor = 6;
 
-export function buildMenu(items, navContainer, parent, level) {
-    if (navContainer) {                
-        var rootElement = document.createElement("ul");
-        rootElement.classList.add("navbar-nav");                
-        buildMenu(items, false, rootElement, 0);
-        document.querySelector(navContainer).append(rootElement);            
-    } else {    
-        level++;            
-        for (var i = 0; i < items.length; i++) {                          
-            var li = document.createElement("li");
+export function buildSiteMap(items, parent) {    
+    if (parent === null){
+        return;
+    }
+    for (var i = 0; i < items.length; i++) {      
+        var li = document.createElement("li");     
+        if ("href" in items[i]) { 
             var a = document.createElement("a");
-            var id = '';   
-            if (parent.classList.contains("navbar-nav")) { 
-                id = "dropdown-"+i;
-                li.classList.add("nav-item");                        
-                a.classList.add("nav-link");                
-            } else {
-                id = parent.getAttribute("id") + "-" + i;
-                a.classList.add("dropdown-item");
-            }                            
-            if ("href" in items[i]) { 
-                a.setAttribute("href", items[i].href);
-            }
-            a.textContent = items[i].label;      
+            a.textContent = items[i].label;    
+            a.setAttribute("href", items[i].href);
             li.append(a);
-            if ("children" in items[i] && items[i].children.length > 0) {                        
-                var d = document.createElement("div");
-                if (level > 1) {
-                    var ind = (level - 1) * indentFactor;
-                    d.style.textIndent = ind + "px";
-                }
-                d.classList.add("dropdown-toggle");
-                d.classList.add("float-start");
-                d.setAttribute("data-bs-toggle", "dropdown");
-                d.setAttribute("data-bs-target", id);
-
-                var ii = document.createElement("i");
-                ii.classList.add('bi');
-                ii.classList.add(iconOpen);                                     
-                d.appendChild(ii);
-                li.prepend(d);
-                
-                var ul = document.createElement("ul");                
-                ul.setAttribute("id", id);
-                ul.classList.add("dropdown-menu");
-                ul.classList.add("dropdown");                  
-                buildMenu(items[i].children, false, ul, level);
-                li.append(ul);
-            } else {
-                li.style.textIndent = level * (indentFactor) + (3 * indentFactor) +"px";
-            }       
-            parent.append(li);                    
-        }                
-    }           
+        }  
+        else if ("xhref" in items[i]) { 
+            var a = document.createElement("a");
+            a.textContent = items[i].label;    
+            a.setAttribute("href", items[i].xhref);
+            a.setAttribute("target", "_blank");
+            li.append(a);
+        }  
+        else{
+            li.textContent = items[i].label;    
+        }
+        if ("children" in items[i] && items[i].children.length > 0) {                  
+            var ul = document.createElement("ul");                
+            ul.setAttribute("id", parent.getAttribute("id") + "-" + i); 
+            buildSiteMap(items[i].children, ul);
+            li.append(ul);
+        }
+        parent.append(li);
+    }     
 }
 
 export function buildAreaMap(request_path,items, parent) {      
@@ -80,89 +53,6 @@ export function buildAreaMap(request_path,items, parent) {
             }
         }
     }     
-}
-
-export function buildSiteMap(items, parent) {    
-    if (parent === null){
-        return;
-    }
-    for (var i = 0; i < items.length; i++) {      
-        var li = document.createElement("li");     
-        if ("href" in items[i]) { 
-            var a = document.createElement("a");
-            a.textContent = items[i].label;    
-            a.setAttribute("href", items[i].href);
-            li.append(a);
-        }  
-        else{
-            li.textContent = items[i].label;    
-        }
-        if ("children" in items[i] && items[i].children.length > 0) {                  
-            var ul = document.createElement("ul");                
-            ul.setAttribute("id", parent.getAttribute("id") + "-" + i); 
-            buildSiteMap(items[i].children, ul);
-            li.append(ul);
-        }
-        parent.append(li);
-    }     
-}
-
-export function setMenuLocation(containerID) {
-    var toggler = document.querySelector('.navbar-toggler').getBoundingClientRect();            
-    var bar = document.querySelector('.navbar').getBoundingClientRect();            
-    var xpos = toggler.left;
-    var ypos = bar.height;
-    if (window.innerWidth < 768) {
-        xpos = 0;
-    }
-    document.querySelector(containerID).style.left = String(xpos)+"px";
-    document.querySelector(containerID).style.top = String(ypos)+"px";          
-}
-
-export function onLoadThisModuleFile(menu, containerID) {
-    buildMenu(menu, containerID, null, null);  
-    setMenuLocation(containerID);   
-
-    
-    const toggleButton = document.getElementById('main-nav-toggler');
-    toggleButton.addEventListener('click', () => {
-        console.log('clicked');
-        const iconElement = toggleButton.querySelector('b');
-        console.log()
-        //iconElement.classList.toggle('bi-list');
-        //iconElement.classList.toggle('bi-x-lg');        
-        if (iconElement.classList.contains('bi-list')) {
-            iconElement.classList.remove('bi-list');
-            iconElement.classList.add('bi-x-lg');                             
-        } else {
-            iconElement.classList.add('bi-list');
-            iconElement.classList.remove('bi-x-lg');                                        
-        }
-    });
-
-    /////// Prevent closing from click inside dropdown
-    document.querySelectorAll('.dropdown-menu').forEach(function(element) {
-        element.addEventListener('click', function (e) {
-            e.stopPropagation();
-        });
-    });
-    const attrObserver = new MutationObserver((mutations) => {
-        mutations.forEach(mu => {                    
-            if (mu.type !== "attributes" && mu.attributeName !== "class") return;
-            var i = mu.target.querySelector("i");
-            if (!mu.target.classList.contains("show")) {
-                i.classList.remove(iconClose);
-                i.classList.add(iconOpen);                                
-            } else {
-                i.classList.add(iconClose);
-                i.classList.remove(iconOpen);                                
-            }
-        });
-    });
-
-    const ddt = document.querySelectorAll(".dropdown-toggle");
-    ddt.forEach(el => attrObserver.observe(el, {attributes: true}));
-
 }
 
 

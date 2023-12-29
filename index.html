@@ -16,25 +16,43 @@
 <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
 
 <link href="assets/css/main.css" id="dynamicMainCss" rel="stylesheet">
+<link href="assets/css/menu.css" id="dynamicMenuCss" rel="stylesheet">
 <script type="module" id="dynamicMainJs"></script>
 <script>
   var linkDate = new Date().toISOString().replace(/:/g, '').replace(/ /g, '').replace(/-/g, '');
   document.getElementById('dynamicMainJs').src = 'assets/js/main.js?date=' + linkDate;
   document.getElementById('dynamicMainCss').href = 'assets/css/main.css?date=' + linkDate;
+  document.getElementById('dynamicMenuCss').href = 'assets/css/menu.css?date=' + linkDate;
 </script>
 </head>
 <title>Welcome to effariwhy.github.io</title><body>
-<div class="container">
-<nav id="navigation" class="navbar">                                                      
-    <button id="main-nav-toggler" class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
-      <b class="text-primary bi bi-list"></b>
-    </button>     
-    <a class="navbar-brand" href="index.html">effariwhy.github.io</a>
-    <div class="collapse" id="main-nav"></div>      
-</nav>
+<header>
+
+<form action="javascript:">
+<input id="left-menu" type="checkbox">
+<input id="left-menu-reset" type="reset">
+<nav class="left-navigation"><main>
+<label for="left-menu" class="menu-toggle"><span>&nbsp;</span></label>
+<label for="left-menu-reset" class="menu-close"><span>&nbsp;</span></label>
+<menu id="menu-left"></menu>
+</main></nav></form>
+
+<h1>site name</h1>
+
+<form action="javascript:">
+<input id="right-menu" type="checkbox">
+<input id="right-menu-reset" type="reset">
+<nav class="right-navigation"><main>
+<label for="right-menu" class="menu-toggle"><span>&nbsp;</span></label>
+<label for="right-menu-reset" class="menu-close"><span>&nbsp;</span></label>
+<menu id="menu-right"></menu>
+</main></nav></form>
+
+</header>
+
 <div id="convertedMarkdown"></div>
 <div id="convertedHtml"></div>
 <div id="area-map2"></div>
-</div>
+
 </body>
 </html>
