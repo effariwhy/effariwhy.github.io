@@ -32,7 +32,7 @@
       <input id="repoName" class="form-control" type="text" placeholder="Repository Name (e.g., username/repo)">
     </div>
     <div class="mb-3">
-      <input id="filePath" class="form-control" type="text" placeholder="File Path in Repository (e.g., folder/file.txt)">
+      <input id="filePathPrefix" class="form-control" type="text" placeholder="File Path Prefix in Repository (e.g., folder/file_prefix)">
     </div>
     <button id="saveToGitHub" class="btn btn-secondary ms-2">Save to GitHub</button>
     <button id="saveSettings" class="btn btn-secondary ms-2">Save Github Settings</button>
@@ -68,20 +68,23 @@
       // Populate input fields with last known values from localStorage
       document.getElementById('githubToken').value = localStorage.getItem('githubToken') || '';
       document.getElementById('repoName').value = localStorage.getItem('repoName') || '';
-      document.getElementById('filePath').value = localStorage.getItem('filePath') || '';
+      document.getElementById('filePathPrefix').value = localStorage.getItem('filePathPrefix') || '';
     });
 
     document.getElementById('saveToGitHub').addEventListener('click', async () => {
       const token = document.getElementById('githubToken').value;
       const repo = document.getElementById('repoName').value;
-      const path = document.getElementById('filePath').value;
+      const filePathPrefixInput = document.getElementById('filePathPrefix').value;
+      const selectedKey = document.getElementById('localStorageKeys').value;
       const content = document.getElementById('localStorageContent').value;
 
-      if (!token || !repo || !path) {
-        alert('Please fill in all the fields.');
+      if (!token || !repo || !filePathPrefixInput || !selectedKey) {
+        alert('Please fill in all the fields and select a key.');
         return;
       }
 
+      // Concatenate the selected key to the file path
+      const path = `${filePathPrefixInput}_${selectedKey}`;
       const url = `https://api.github.com/repos/${repo}/contents/${path}`;
 
       // Get the current file SHA if it exists
@@ -174,12 +177,12 @@
     document.getElementById('saveSettings').addEventListener('click', () => {
       const token = document.getElementById('githubToken').value;
       const repo = document.getElementById('repoName').value;
-      const path = document.getElementById('filePath').value;
+      const path = document.getElementById('filePathPrefix').value;
 
       // Save input values to localStorage
       localStorage.setItem('githubToken', token);
       localStorage.setItem('repoName', repo);
-      localStorage.setItem('filePath', path);
+      localStorage.setItem('filePathPrefix', path);
 
       alert('Settings saved successfully!');
     });
