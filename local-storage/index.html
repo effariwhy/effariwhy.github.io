@@ -104,15 +104,13 @@
         return;
       }
 
-      // Generate unique identifiers
       let clientId = localStorage.getItem('clientId');
       if (!clientId) {
         clientId = crypto.randomUUID();
         localStorage.setItem('clientId', clientId);
       }
 
-      // Construct the file path
-      const path = `${clientId}/${filePathPrefix}${selectedKey}`;
+\      const path = `${clientId}/${filePathPrefix}${selectedKey}`;
       const url = `https://api.github.com/repos/${repo}/contents/${path}`;
 
       prependToLog(`Saving to ${repo}/${url}...`);
@@ -131,7 +129,6 @@
       } catch (error) {
         prependToLog('Error fetching file SHA with fetch:' + error);
 
-        // Fallback to XMLHttpRequest
         const xhr = new XMLHttpRequest();
         xhr.open('GET', url, false);
         xhr.setRequestHeader('Authorization', `token ${token}`);
@@ -145,14 +142,13 @@
         }
       }
 
-      // Updated to handle non-ASCII characters in content
       function toBase64(str) {
         return btoa(unescape(encodeURIComponent(str)));
       }
 
       const body = {
-        message: 'Save textarea content to GitHub',
-        content: toBase64(content), // Use the updated encoding function
+        message: `Latest value for ${selectedKey}`,
+        content: toBase64(content), 
         sha: sha
       };
 
@@ -178,7 +174,6 @@
       const repo = document.getElementById('repoName').value;
       const path = document.getElementById('filePathPrefix').value;
 
-      // Save input values to localStorage
       localStorage.setItem('githubToken', token);
       localStorage.setItem('repoName', repo);
       localStorage.setItem('filePathPrefix', path);
