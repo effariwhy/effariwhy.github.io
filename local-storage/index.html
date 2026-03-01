@@ -11,14 +11,11 @@
   <div class="container mt-5">
     <h1>Local Storage</h1>
     <div class="mb-3">
-      <button id="refreshLocalStorage" class="btn btn-primary">Refresh Keys</button>
       <select id="localStorageKeys" class="form-select mb-3">
         <option value="" disabled selected>Select a key</option>
       </select>
-      <h2>Contents of selected key</h2>
       <textarea id="localStorageContent" class="form-control" rows="10" readonly></textarea>
     </div>
-    <h2>Github Settings</h2>
     <div class="mb-3">
       <input id="githubToken" class="form-control" type="password" placeholder="GitHub Personal Access Token">
     </div>
@@ -29,6 +26,9 @@
       <input id="filePath" class="form-control" type="text" placeholder="File Path in Repository (e.g., folder/file.txt)">
     </div>
     <button id="saveToGitHub" class="btn btn-secondary ms-2">Save to GitHub</button>
+    <div class="mb-3">
+      <button id="saveSettings" class="btn btn-secondary">Save Settings</button>
+    </div>
   </div>
 
   <script>
@@ -75,10 +75,6 @@
         return;
       }
 
-      // Save input values to localStorage
-      localStorage.setItem('githubToken', token);
-      localStorage.setItem('repoName', repo);
-      localStorage.setItem('filePath', path);
 
       const url = `https://api.github.com/repos/${repo}/contents/${path}`;
 
@@ -126,6 +122,19 @@
         console.error('Error saving file to GitHub:', error);
         alert('An error occurred while saving the file to GitHub.');
       }
+    });
+
+    document.getElementById('saveSettings').addEventListener('click', () => {
+      const token = document.getElementById('githubToken').value;
+      const repo = document.getElementById('repoName').value;
+      const path = document.getElementById('filePath').value;
+
+      // Save input values to localStorage
+      localStorage.setItem('githubToken', token);
+      localStorage.setItem('repoName', repo);
+      localStorage.setItem('filePath', path);
+
+      alert('Settings saved successfully!');
     });
   </script>
 </body>
