@@ -138,9 +138,11 @@
       xhrPut.onload = function () {
         if (xhrPut.status === 200) {
           alert('File saved to GitHub successfully!');
+        } else if (xhrPut.status >= 200 && xhrPut.status < 300) { // Handle other 2xx success codes
+          alert('File saved to GitHub successfully!');
         } else {
           console.error('Error saving file to GitHub with XMLHttpRequest:', xhrPut.responseText);
-          alert('Failed to save file to GitHub.');
+          alert('Failed to save file to GitHub. Status:' + xhrPut.status + '... responseText:' + xhrPut.responseText);
         }
       };
       xhrPut.send(JSON.stringify(body));
