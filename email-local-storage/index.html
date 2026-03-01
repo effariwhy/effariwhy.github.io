@@ -13,14 +13,19 @@
     <div class="mb-3">
       <textarea id="localStorageContent" class="form-control" rows="10" readonly></textarea>
     </div>
-    <button id="showLocalStorage" class="btn btn-primary">Show Local Storage</button>
+    <button id="refreshLocalStorage" class="btn btn-primary">Refresh Local Storage</button>
   </div>
 
   <script>
-    document.getElementById('showLocalStorage').addEventListener('click', function() {
+    function loadLocalStorage() {
       const localStorageData = JSON.stringify(localStorage, null, 2);
       document.getElementById('localStorageContent').value = localStorageData;
-    });
+    }
+
+    document.getElementById('refreshLocalStorage').addEventListener('click', loadLocalStorage);
+
+    // Automatically load localStorage content on page load
+    window.addEventListener('DOMContentLoaded', loadLocalStorage);
   </script>
 </body>
 </html>
