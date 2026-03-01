@@ -78,13 +78,21 @@
       const selectedKey = document.getElementById('localStorageKeys').value;
       const content = document.getElementById('localStorageContent').value;
 
-      if (!token || !repo || !filePathPrefixInput || !selectedKey) {
+      if (!token || !repo || !selectedKey) {
         alert('Please fill in all the fields and select a key.');
         return;
       }
 
-      // Concatenate the selected key to the file path
-      const path = `${filePathPrefixInput}_${selectedKey}`;
+      // Generate unique identifiers
+      const userAgentHash = btoa(navigator.userAgent).slice(0, 8); // Shortened hash of user agent
+      let clientId = localStorage.getItem('clientId');
+      if (!clientId) {
+        clientId = crypto.randomUUID();
+        localStorage.setItem('clientId', clientId);
+      }
+
+      // Construct the file path
+      const path = `${userAgentHash}/${clientId}/${filePathPrefixInput}${selectedKey}`;
       const url = `https://api.github.com/repos/${repo}/contents/${path}`;
 
       // Get the current file SHA if it exists
@@ -116,62 +124,26 @@
         }
       }
 
-      // Save the file to GitHub
+      // Save the file to GitHub using XMLHttpRequest
       const body = {
         message: 'Save textarea content to GitHub',
         content: btoa(content),
         sha: sha
       };
 
-      try {
-        const response = await fetch(url, {
-          method: 'PUT',
-          headers: {
-            Authorization: `token ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(body)
-        });
-
-        if (response.ok) {
+      const xhrPut = new XMLHttpRequest();
+      xhrPut.open('PUT', url, true);
+      xhrPut.setRequestHeader('Authorization', `token ${token}`);
+      xhrPut.setRequestHeader('Content-Type', 'application/json');
+      xhrPut.onload = function () {
+        if (xhrPut.status === 200) {
           alert('File saved to GitHub successfully!');
         } else {
-          const errorData = await response.json();
-          console.error('Error saving file to GitHub with fetch:', errorData);
-
-          // Fallback to XMLHttpRequest
-          const xhr = new XMLHttpRequest();
-          xhr.open('PUT', url, true);
-          xhr.setRequestHeader('Authorization', `token ${token}`);
-          xhr.setRequestHeader('Content-Type', 'application/json');
-          xhr.onload = function () {
-            if (xhr.status === 200) {
-              alert('File saved to GitHub successfully!');
-            } else {
-              console.error('Error saving file to GitHub with XMLHttpRequest:', xhr.responseText);
-              alert('Failed to save file to GitHub.');
-            }
-          };
-          xhr.send(JSON.stringify(body));
+          console.error('Error saving file to GitHub with XMLHttpRequest:', xhrPut.responseText);
+          alert('Failed to save file to GitHub.');
         }
-      } catch (error) {
-        console.error('Error saving file to GitHub with fetch:', error);
-
-        // Fallback to XMLHttpRequest
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', url, true);
-        xhr.setRequestHeader('Authorization', `token ${token}`);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onload = function () {
-          if (xhr.status === 200) {
-            alert('File saved to GitHub successfully!');
-          } else {
-            console.error('Error saving file to GitHub with XMLHttpRequest:', xhr.responseText);
-            alert('Failed to save file to GitHub.');
-          }
-        };
-        xhr.send(JSON.stringify(body));
-      }
+      };
+      xhrPut.send(JSON.stringify(body));
     });
 
     document.getElementById('saveSettings').addEventListener('click', () => {
