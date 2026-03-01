@@ -11,21 +11,120 @@
   <div class="container mt-5">
     <h1>Email Local Storage</h1>
     <div class="mb-3">
+      <select id="localStorageKeys" class="form-select mb-3">
+        <option value="" disabled selected>Select a key</option>
+      </select>
       <textarea id="localStorageContent" class="form-control" rows="10" readonly></textarea>
     </div>
-    <button id="refreshLocalStorage" class="btn btn-primary">Refresh Local Storage</button>
+    <div class="mb-3">
+      <input id="githubToken" class="form-control" type="password" placeholder="GitHub Personal Access Token">
+    </div>
+    <div class="mb-3">
+      <input id="repoName" class="form-control" type="text" placeholder="Repository Name (e.g., username/repo)">
+    </div>
+    <div class="mb-3">
+      <input id="filePath" class="form-control" type="text" placeholder="File Path in Repository (e.g., folder/file.txt)">
+    </div>
+    <button id="refreshLocalStorage" class="btn btn-primary">Refresh Keys</button>
+    <button id="saveToGitHub" class="btn btn-secondary ms-2">Save to GitHub</button>
   </div>
 
   <script>
-    function loadLocalStorage() {
-      const localStorageData = JSON.stringify(localStorage, null, 2);
-      document.getElementById('localStorageContent').value = localStorageData;
+    function refreshLocalStorageKeys() {
+      const select = document.getElementById('localStorageKeys');
+      select.innerHTML = '<option value="" disabled selected>Select a key</option>';
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = key;
+        select.appendChild(option);
+      }
     }
 
-    document.getElementById('refreshLocalStorage').addEventListener('click', loadLocalStorage);
+    function loadLocalStorageContent() {
+      const selectedKey = document.getElementById('localStorageKeys').value;
+      const content = localStorage.getItem(selectedKey);
+      document.getElementById('localStorageContent').value = content || '';
+    }
 
-    // Automatically load localStorage content on page load
-    window.addEventListener('DOMContentLoaded', loadLocalStorage);
+    document.getElementById('refreshLocalStorage').addEventListener('click', refreshLocalStorageKeys);
+    document.getElementById('localStorageKeys').addEventListener('change', loadLocalStorageContent);
+
+    // Automatically populate the select input on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      refreshLocalStorageKeys();
+
+      // Populate input fields with last known values from localStorage
+      document.getElementById('githubToken').value = localStorage.getItem('githubToken') || '';
+      document.getElementById('repoName').value = localStorage.getItem('repoName') || '';
+      document.getElementById('filePath').value = localStorage.getItem('filePath') || '';
+    });
+
+    document.getElementById('saveToGitHub').addEventListener('click', async () => {
+      const token = document.getElementById('githubToken').value;
+      const repo = document.getElementById('repoName').value;
+      const path = document.getElementById('filePath').value;
+      const content = document.getElementById('localStorageContent').value;
+
+      if (!token || !repo || !path) {
+        alert('Please fill in all the fields.');
+        return;
+      }
+
+      // Save input values to localStorage
+      localStorage.setItem('githubToken', token);
+      localStorage.setItem('repoName', repo);
+      localStorage.setItem('filePath', path);
+
+      const url = `https://api.github.com/repos/${repo}/contents/${path}`;
+
+      // Get the current file SHA if it exists
+      let sha = null;
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `token ${token}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          sha = data.sha;
+        }
+      } catch (error) {
+        console.error('Error fetching file SHA:', error);
+      }
+
+      // Save the file to GitHub
+      const body = {
+        message: 'Save textarea content to GitHub',
+        content: btoa(content),
+        sha: sha
+      };
+
+      try {
+        const response = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            Authorization: `token ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        });
+
+        if (response.ok) {
+          alert('File saved to GitHub successfully!');
+        } else {
+          const errorData = await response.json();
+          console.error('Error saving file to GitHub:', errorData);
+          alert('Failed to save file to GitHub. Check the console for details.');
+        }
+      } catch (error) {
+        console.error('Error saving file to GitHub:', error);
+        alert('An error occurred while saving the file to GitHub.');
+      }
+    });
   </script>
 </body>
 </html>
