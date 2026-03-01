@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Email Local Storage</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <div class="container mt-5">
+    <h1>Email Local Storage</h1>
+    <div class="mb-3">
+      <textarea id="localStorageContent" class="form-control" rows="10" readonly></textarea>
+    </div>
+    <button id="refreshLocalStorage" class="btn btn-primary">Refresh Local Storage</button>
+    <button id="saveToDrive" class="btn btn-secondary ms-2">Save to Google Drive</button>
+  </div>
+
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script>
+    const CLIENT_ID = 'YOUR_CLIENT_ID'; // Replace with your Google Cloud Client ID
+    const API_KEY = 'YOUR_API_KEY'; // Replace with your Google Cloud API Key
+    const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+
+    function authenticate() {
+      return gapi.auth2.getAuthInstance()
+        .signIn({ scope: SCOPES })
+        .then(() => console.log('Sign-in successful'))
+        .catch(err => console.error('Error signing in', err));
+    }
+
+    function loadClient() {
+      gapi.client.setApiKey(API_KEY);
+      return gapi.client.load('https://content.googleapis.com/discovery/v1/apis/drive/v3/rest')
+        .then(() => console.log('GAPI client loaded for API'))
+        .catch(err => console.error('Error loading GAPI client for API', err));
+    }
+
+    function saveToDrive() {
+      const content = document.getElementById('localStorageContent').value;
+      const file = new Blob([content], { type: 'text/plain' });
+      const metadata = {
+        name: 'localStorageContent.txt',
+        mimeType: 'text/plain'
+      };
+
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+      form.append('file', file);
+
+      fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: new Headers({
+          'Authorization': `Bearer ${gapi.auth.getToken().access_token}`
+        }),
+        body: form
+      })
+      .then(response => response.json())
+      .then(data => console.log('File saved to Google Drive', data))
+      .catch(err => console.error('Error saving file to Google Drive', err));
+    }
+
+    function loadLocalStorage() {
+      const localStorageData = JSON.stringify(localStorage, null, 2);
+      document.getElementById('localStorageContent').value = localStorageData;
+    }
+
+    document.getElementById('refreshLocalStorage').addEventListener('click', loadLocalStorage);
+
+    // Automatically load localStorage content on page load
+    window.addEventListener('DOMContentLoaded', loadLocalStorage);
+
+    document.getElementById('saveToDrive').addEventListener('click', () => {
+      authenticate().then(saveToDrive);
+    });
+
+    gapi.load('client:auth2', () => {
+      gapi.auth2.init({ client_id: CLIENT_ID });
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
