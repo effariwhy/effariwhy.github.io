@@ -95,7 +95,7 @@
     document.getElementById('saveToGitHub').addEventListener('click', async () => {
       const token = document.getElementById('githubToken').value;
       const repo = document.getElementById('repoName').value;
-      const filePathPrefixInput = document.getElementById('filePathPrefix').value;
+      const filePathPrefix = document.getElementById('filePathPrefix').value;
       const selectedKey = document.getElementById('localStorageKeys').value;
       const content = document.getElementById('localStorageContent').value;
 
@@ -112,9 +112,10 @@
       }
 
       // Construct the file path
-      const path = `${clientId}/${filePathPrefixInput}${selectedKey}`;
+      const path = `${clientId}/${filePathPrefix}${selectedKey}`;
       const url = `https://api.github.com/repos/${repo}/contents/${path}`;
 
+      prependToLog(`Saving to ${repo}/${url}...`);
       // Get the current file SHA if it exists
       let sha = null;
       try {
@@ -161,9 +162,9 @@
       xhrPut.setRequestHeader('Content-Type', 'application/json');
       xhrPut.onload = function () {
         if (xhrPut.status === 200) {
-          prependToLog('File saved to GitHub successfully! Status:' + xhrPut.status');
+          prependToLog('File saved to GitHub successfully! Status:' + xhrPut.status);
         } else if (xhrPut.status >= 200 && xhrPut.status < 300) { // Handle other 2xx success codes
-          prependToLog('File saved to GitHub successfully! Status:' + xhrPut.status');
+          prependToLog('File saved to GitHub successfully! Status:' + xhrPut.status);
         } else {
           prependToLog('Error saving file to GitHub with XMLHttpRequest:', xhrPut.responseText);
           prependToLog('Failed to save file to GitHub. Status:' + xhrPut.status + '... responseText:' + xhrPut.responseText);
@@ -189,12 +190,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
