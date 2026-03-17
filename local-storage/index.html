@@ -110,7 +110,7 @@
         localStorage.setItem('clientId', clientId);
       }
 
-\      const path = `${clientId}/${filePathPrefix}${selectedKey}`;
+      const path = `${clientId}/${filePathPrefix}${selectedKey}`;
       const url = `https://api.github.com/repos/${repo}/contents/${path}`;
 
       prependToLog(`Saving to ${repo}/${url}...`);
