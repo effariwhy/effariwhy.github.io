@@ -27,7 +27,11 @@
           <select id="localStorageKeys" class="form-select mb-3">
             <option value="" disabled selected>Select a key</option>
           </select>
-          <textarea id="localStorageContent" class="form-control" rows="10" readonly></textarea>
+
+          <textarea id="localStorageContent" class="form-control mb-2" rows="10" readonly></textarea>
+
+          <!-- ✅ NEW CLEAR BUTTON -->
+          <button id="clearTextarea" class="btn btn-danger">Clear Textarea</button>
         </div>
 
         <h2>Save Key Contents to GitHub</h2>
@@ -76,6 +80,11 @@
     document.getElementById('refreshLocalStorageKeys').addEventListener('click', refreshLocalStorageKeys);
     document.getElementById('localStorageKeys').addEventListener('change', loadLocalStorageContent);
 
+    // ✅ CLEAR BUTTON LOGIC
+    document.getElementById('clearTextarea').addEventListener('click', () => {
+      document.getElementById('localStorageContent').value = "";
+    });
+
     // Automatically populate the select input on page load
     window.addEventListener('DOMContentLoaded', () => {
       refreshLocalStorageKeys();
@@ -114,7 +123,7 @@
       const url = `https://api.github.com/repos/${repo}/contents/${path}`;
 
       prependToLog(`Saving to ${repo}/${url}...`);
-      // Get the current file SHA if it exists
+
       let sha = null;
       try {
         const response = await fetch(url, {
@@ -159,7 +168,7 @@
       xhrPut.onload = function () {
         if (xhrPut.status === 200) {
           prependToLog('File saved to GitHub successfully! Status:' + xhrPut.status);
-        } else if (xhrPut.status >= 200 && xhrPut.status < 300) { // Handle other 2xx success codes
+        } else if (xhrPut.status >= 200 && xhrPut.status < 300) {
           prependToLog('File saved to GitHub successfully! Status:' + xhrPut.status);
         } else {
           prependToLog('Error saving file to GitHub with XMLHttpRequest:', xhrPut.responseText);
