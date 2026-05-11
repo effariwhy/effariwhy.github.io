@@ -30,8 +30,10 @@
 
           <textarea id="localStorageContent" class="form-control mb-2" rows="10" readonly></textarea>
 
-          <!-- ✅ NEW CLEAR BUTTON -->
+          <!-- Buttons -->
           <button id="clearTextarea" class="btn btn-danger">Clear Textarea</button>
+          <button id="saveTextareaToLocal" class="btn btn-success ms-2">Save Textarea to Local Storage</button>
+          <button id="deleteLocalStorageKey" class="btn btn-warning ms-2">Delete Key</button>
         </div>
 
         <h2>Save Key Contents to GitHub</h2>
@@ -80,16 +82,47 @@
     document.getElementById('refreshLocalStorageKeys').addEventListener('click', refreshLocalStorageKeys);
     document.getElementById('localStorageKeys').addEventListener('change', loadLocalStorageContent);
 
-    // ✅ CLEAR BUTTON LOGIC
+    // Clear textarea
     document.getElementById('clearTextarea').addEventListener('click', () => {
       document.getElementById('localStorageContent').value = "";
     });
 
-    // Automatically populate the select input on page load
+    // Save textarea back to localStorage
+    document.getElementById('saveTextareaToLocal').addEventListener('click', () => {
+      const selectedKey = document.getElementById('localStorageKeys').value;
+      const content = document.getElementById('localStorageContent').value;
+
+      if (!selectedKey) {
+        prependToLog('No key selected — cannot save to localStorage.');
+        return;
+      }
+
+      localStorage.setItem(selectedKey, content);
+      prependToLog(`Saved updated content back to localStorage key "${selectedKey}".`);
+    });
+
+    // NEW: Delete key from localStorage
+    document.getElementById('deleteLocalStorageKey').addEventListener('click', () => {
+      const selectedKey = document.getElementById('localStorageKeys').value;
+
+      if (!selectedKey) {
+        prependToLog('No key selected — cannot delete.');
+        return;
+      }
+
+      localStorage.removeItem(selectedKey);
+      prependToLog(`Deleted localStorage key "${selectedKey}".`);
+
+      // Clear textarea
+      document.getElementById('localStorageContent').value = "";
+
+      // Reload dropdown
+      refreshLocalStorageKeys();
+    });
+
+    // Populate on load
     window.addEventListener('DOMContentLoaded', () => {
       refreshLocalStorageKeys();
-
-      // Populate input fields with last known values from localStorage
       document.getElementById('githubToken').value = localStorage.getItem('githubToken') || '';
       document.getElementById('repoName').value = localStorage.getItem('repoName') || '';
       document.getElementById('filePathPrefix').value = localStorage.getItem('filePathPrefix') || '';
